@@ -93,11 +93,26 @@ void setup() {
         Wire.write("4-off");  /* sends id cua thiet bi can bat  string */
         Wire.endTransmission();    /* stop transmitting */
         request->send(200, "text/plain", "OK");
+    
 
   });
 
   //lay nhiet do, do am
      server.on("/temp", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+      Wire.requestFrom(8, 50); /* request & read data of size 13 from slave */
+      String result = "";
+      while(Wire.available()){
+        char c = Wire.read();
+        result+= c;
+       
+      } 
+     Serial.print(String(result));
+     request->send(200, "text/plain", result);
+
+  });
+
+    //lay nhiet do, do am
+     server.on("/get-all-lamp-status", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
       Wire.requestFrom(8, 13); /* request & read data of size 13 from slave */
       String result = "";
       while(Wire.available()){

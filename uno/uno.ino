@@ -50,7 +50,12 @@ String temp = "";
 String hum = "";
 
 
+//quat
+const int fanPin = 3;
+
 void setup() {
+  pinMode(fanPin,OUTPUT);
+  
   //lcd va cam bien dht
   lcd.init();  
   lcd.backlight(); 
@@ -75,6 +80,7 @@ void setup() {
 }
 
 void loop() {
+  digitalWrite(fanPin, HIGH);
   
     //btn1
     byte buttonState = digitalRead(buttonPin);
@@ -120,7 +126,7 @@ void loop() {
 
 
     //cam bien va lcd
- float h = dht.readHumidity();
+  float h = dht.readHumidity();
   float t = dht.readTemperature();
 
   if (isnan(t) || isnan(h)) { 
@@ -167,15 +173,13 @@ void receiveEvent(int howMany) {
      digitalWrite(ledPin4, HIGH);
   }else if(status.equals("4-off")){
      digitalWrite(ledPin4, LOW);
+     
   } 
 }
 
 // function that executes whenever data is requested from master
 void requestEvent() {
-  
-  //String ledStatus = String(LED_state);
-//  String tempAndHum= "temp: " + String(temp) + ",humi:" + hum ;
-    Serial.println("nhiet do hien tai la: "+temp+  ", do am la:"+ hum);
-   Wire.print( String(temp)+ ","+ String(hum) );  /*send string on request */
+ //String(LED_state)+","+String(LED_state2) +","+String(LED_state3)+","String(LED_state4)+"," +
+   Wire.print(String(temp)+","+String(hum) +","+LED_state+","+LED_state2+","+LED_state3+","+LED_state4);
 
 }
