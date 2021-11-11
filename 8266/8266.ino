@@ -128,7 +128,7 @@ void setup() {
         request->send(200, "text/plain", "OK");
   });
   server.on("/fan-4-on", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
-        Wire.beginTransmission(9); /* begin with device address 8 */
+        Wire.beginTransmission(9); /* begin with device address 9 */
         Wire.write("fan-4-on");  /* sends id cua thiet bi can bat  string */
         Wire.endTransmission();    /* stop transmitting */
 
