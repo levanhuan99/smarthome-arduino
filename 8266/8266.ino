@@ -4,11 +4,13 @@
 #include <ESPAsyncWebServer.h>
 const char* ssid = "TP-Link"; //Write your SSID
 const char* password = "34219317";   //Write your password
- char* input_parameter = "id";   //1: led1, 2:led2, 3: led3
+char* input_parameter = "id";   //1: led1, 2:led2, 3: led3
 
 AsyncWebServer server(80);
 const int D1 = 5;
 const int D2 = 4;
+//const int D3 = 1;
+//const int D4 = 2;
 void setup() {
  Serial.begin(9600); /* begin serial for debug */
   
@@ -22,8 +24,10 @@ void setup() {
   Serial.println(WiFi.localIP());
 
  Wire.begin(D1, D2); /* join i2c bus with SDA=D1 and SCL=D2 of NodeMCU */
+// Wire.begin(D3, D4);
 
   server.on("/hello", HTTP_GET, [](AsyncWebServerRequest *request){
+    
     request->send(200, "text/plain", "OK");
   });
 
@@ -32,7 +36,6 @@ void setup() {
         Wire.write("1-on");  /* sends id cua thiet bi can bat  string */
         Wire.endTransmission();    /* stop transmitting */
         request->send(200, "text/plain", "OK");
-
 
   });
 
@@ -97,36 +100,73 @@ void setup() {
 
   });
 
-  //lay nhiet do, do am
-     server.on("/temp", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
-      Wire.requestFrom(8, 50); /* request & read data of size 13 from slave */
+  //lay nhiet do, do am/tran thai den
+     server.on("/get-all-status", HTTP_GET, [] (AsyncWebServerRequest *request) { 
+      Wire.requestFrom(8, 50); /* request & read data of size 50 from slave */
       String result = "";
       while(Wire.available()){
         char c = Wire.read();
         result+= c;
        
       } 
+      Wire.requestFrom(9, 50); /* request & read data of size 50 from slave */
+      while(Wire.available()){
+        char c1 = Wire.read();
+        result+= c1;
+       
+      } 
      Serial.print(String(result));
      request->send(200, "text/plain", result);
 
   });
+  
+  //open the door
+     server.on("/open-door", HTTP_GET, [] (AsyncWebServerRequest *request) { 
+      Wire.beginTransmission(8); /* begin with device address 8 */
+        Wire.write("door-1-open");  /* sends id cua thiet bi can bat  string */
+        Wire.endTransmission();    /* stop transmitting */
+        request->send(200, "text/plain", "OK");
+  });
+  server.on("/fan-4-on", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+        Wire.beginTransmission(9); /* begin with device address 8 */
+        Wire.write("fan-4-on");  /* sends id cua thiet bi can bat  string */
+        Wire.endTransmission();    /* stop transmitting */
 
-    //lay nhiet do, do am
-     server.on("/get-all-lamp-status", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
-      Wire.requestFrom(8, 13); /* request & read data of size 13 from slave */
-      String result = "";
-      while(Wire.available()){
-        char c = Wire.read();
-        result+= c;
-       
-      }
-      Serial.print(String(result));
-    request->send(200, "text/plain", result);
+        request->send(200, "text/plain", "OK");
 
   });
+
+
   server.begin();
+  GetExternalIP();
 }
 
 void loop() {
 
+}
+
+void GetExternalIP()
+{
+  WiFiClient client;
+  if (!client.connect("api.ipify.org", 80)) {
+    Serial.println("Failed to connect with 'api.ipify.org' !");
+  }
+  else {
+    int timeout = millis() + 5000;
+    client.print("GET /?format=json HTTP/1.1\r\nHost: api.ipify.org\r\n\r\n");
+    while (client.available() == 0) {
+      if (timeout - millis() < 0) {
+        Serial.println(">>> Client Timeout !");
+        client.stop();
+        return;
+      }
+    }
+    int size;
+    while ((size = client.available()) > 0) {
+      uint8_t* msg = (uint8_t*)malloc(size);
+      size = client.read(msg, size);
+      Serial.write(msg, size);
+      free(msg);
+    }
+  }
 }

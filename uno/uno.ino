@@ -49,12 +49,8 @@ byte degree[8] = {
 String temp = "";
 String hum = "";
 
-
-//quat
-const int fanPin = 3;
-
 void setup() {
-  pinMode(fanPin,OUTPUT);
+   Serial.print("hello");
   
   //lcd va cam bien dht
   lcd.init();  
@@ -64,7 +60,7 @@ void setup() {
   lcd.print("Do am: ");
   lcd.createChar(1, degree);
   dht.begin();  
-  
+
   pinMode(ledPin, OUTPUT);
   pinMode(buttonPin, INPUT); 
   pinMode(ledPin2, OUTPUT);
@@ -80,8 +76,6 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(fanPin, HIGH);
-  
     //btn1
     byte buttonState = digitalRead(buttonPin);
 
@@ -128,7 +122,7 @@ void loop() {
     //cam bien va lcd
   float h = dht.readHumidity();
   float t = dht.readTemperature();
-
+  
   if (isnan(t) || isnan(h)) { 
   } 
   else {
@@ -169,12 +163,19 @@ void receiveEvent(int howMany) {
   }else if(status.equals("3-off")){
      digitalWrite(ledPin3, LOW);
   } 
-    else if(status.equals("4-on")){
+  else if(status.equals("4-on")){
      digitalWrite(ledPin4, HIGH);
   }else if(status.equals("4-off")){
      digitalWrite(ledPin4, LOW);
      
   } 
+  //open door door-1-open
+//  else if(status.equals("door-1-open")){
+//     digitalWrite(ledPin5, HIGH);         //TODO change ledPin to door
+//  }else if(status.equals("4-off")){
+//     digitalWrite(ledPin5, LOW);
+//     
+//  } 
 }
 
 // function that executes whenever data is requested from master
