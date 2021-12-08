@@ -136,6 +136,14 @@ void setup() {
 
   });
 
+  server.on("/open-door", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+        Wire.beginTransmission(10); /* begin with device address 10*/
+        Wire.write("open-door");  /* sends id cua thiet bi can bat  string */
+        Wire.endTransmission();    /* stop transmitting */
+
+        request->send(200, "text/plain", "OK");
+
+  });
 
   server.begin();
   GetExternalIP();
