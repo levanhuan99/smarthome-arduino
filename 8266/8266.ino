@@ -9,8 +9,9 @@ char* input_parameter = "id";   //1: led1, 2:led2, 3: led3
 AsyncWebServer server(80);
 const int D1 = 5;
 const int D2 = 4;
-//const int D3 = 1;
-//const int D4 = 2;
+
+const char* PARAM_MESSAGE = "current_user_name";
+
 void setup() {
  Serial.begin(9600); /* begin serial for debug */
   
@@ -121,7 +122,7 @@ void setup() {
   });
   
   //open the door
-     server.on("/open-door", HTTP_GET, [] (AsyncWebServerRequest *request) { 
+  server.on("/open-door", HTTP_GET, [] (AsyncWebServerRequest *request) { 
       Wire.beginTransmission(8); /* begin with device address 8 */
         Wire.write("door-1-open");  /* sends id cua thiet bi can bat  string */
         Wire.endTransmission();    /* stop transmitting */
@@ -131,18 +132,23 @@ void setup() {
         Wire.beginTransmission(9); /* begin with device address 9 */
         Wire.write("fan-4-on");  /* sends id cua thiet bi can bat  string */
         Wire.endTransmission();    /* stop transmitting */
-
         request->send(200, "text/plain", "OK");
 
   });
 
   server.on("/open-door", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+        String message;
+        if (request->hasParam(PARAM_MESSAGE)) {
+            message = request->getParam(PARAM_MESSAGE)->value();
+        } else {
+            message = "";
+        }
+
         Wire.beginTransmission(10); /* begin with device address 10*/
-        Wire.write("open-door");  /* sends id cua thiet bi can bat  string */
+        Wire.write(message.concat(",open-door"));  /* sends id cua thiet bi can bat  string */
         Wire.endTransmission();    /* stop transmitting */
-
         request->send(200, "text/plain", "OK");
-
+        
   });
 
   server.begin();

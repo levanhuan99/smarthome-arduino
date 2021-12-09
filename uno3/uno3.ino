@@ -2,9 +2,10 @@
 #include <MFRC522.h>
 #include <Servo.h>
 #include <LiquidCrystal_I2C.h>
+LiquidCrystal_I2C lcd(0x27, 16, 2);
+
 #include <Wire.h>
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 #define SS_PIN 10
 #define RST_PIN 9
@@ -146,26 +147,26 @@ else
   
  
 }
+
 // su kien mo cua
-
-
- void receiveEvent(int howMany) {
-    String status ="";            //bat tat den khi nhan duoc tin hieu mo cua tu 8266
+void receiveEvent(int howMany) {
+    String input ="";            //bat tat den khi nhan duoc tin hieu mo cua tu 8266
     while(0 < Wire.available()){
     char c = Wire.read(); 
-    status+=c;
+    input+=c;
   }
-  
-  if(status.equals("open-door")){
+  String user_name = getValue(input, ',', 0);
+  String param = getValue(input, ',', 1);
+  if(param.equals("open-door")){
 
       lcd.clear();
       lcd.setCursor(1,0);
-      lcd.print("  Open door ");
+      lcd.print("  user_name ");
       lcd.setCursor(2,1);
-      lcd.print(" cho nguoi vao ");
+      lcd.print(" user_name ");
       digitalWrite(RED_LED,HIGH);
       delay(500);
-      Serial.println("Open door");
+      Serial.println("user_name");
       Serial.println();
       digitalWrite(1,1);
       myservo1.write(0);
@@ -176,7 +177,21 @@ else
        
 }
   
+String getValue(String data, char separator, int index)
+{
+    int found = 0;
+    int strIndex[] = { 0, -1 };
+    int maxIndex = data.length() - 1;
 
+    for (int i = 0; i <= maxIndex && found <= index; i++) {
+        if (data.charAt(i) == separator || i == maxIndex) {
+            found++;
+            strIndex[0] = strIndex[1] + 1;
+            strIndex[1] = (i == maxIndex) ? i+1 : i;
+        }
+    }
+    return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
+}
 
 // function that executes whenever data is requested from master
 void requestEvent() {
