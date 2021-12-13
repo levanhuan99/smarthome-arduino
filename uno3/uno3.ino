@@ -1,11 +1,8 @@
 #include <SPI.h>
 #include <MFRC522.h>
 #include <Servo.h>
-#include <LiquidCrystal_I2C.h>
-LiquidCrystal_I2C lcd(0x27, 16, 2);
-
-#include <Wire.h>
-
+//#include <LiquidCrystal_I2C.h>
+//LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 #define SS_PIN 10
 #define RST_PIN 9
@@ -13,14 +10,11 @@ LiquidCrystal_I2C lcd(0x27, 16, 2);
 Servo myservo1, myservo2;
 #define GREEN_LED 6
 #define RED_LED 4
+
 MFRC522 mfrc522(SS_PIN, RST_PIN);   // Create MFRC522 instance.
- 
+int data ;
 void setup() 
 {
-  Wire.begin(10);                /* join i2c bus with address 10 */
-  Wire.onReceive(receiveEvent); /* register receive event */
-  Wire.onRequest(requestEvent); /* register request event */
-//  
   Serial.begin(9600);   // Initiate a serial communication
   SPI.begin();      // Initiate  SPI bus
   mfrc522.PCD_Init();   // Initiate MFRC522
@@ -33,167 +27,90 @@ void setup()
   myservo1.attach(7);
   myservo2.attach(8);
   
-  lcd.init();       // khai báo sử dụng LCD
-  lcd.begin(16, 2);
-  lcd.backlight();
-  int l;
-  Serial.println("Hệ thống cửa tự động");
-  lcd.clear();
-  lcd.setCursor(1,0);       // Cột 1 hàng 1 
-  lcd.print(" HE THONG CUA ");
-  lcd.setCursor(2,1);         // cột 2 hàng 2
-  lcd.print(" THONG MINH ");
+//  lcd.init();       // khai báo sử dụng LCD
+//  lcd.begin(16, 2);
+//  lcd.backlight();
+//  int l;
+//  Serial.println("he thong tu dong");
+//  lcd.clear();
+//  lcd.setCursor(1,0);       // Cột 1 hàng 1 
+//  lcd.print(" HE THONG CUA ");
+//  lcd.setCursor(2,1);         // cột 2 hàng 2
+//  lcd.print(" THONG MINH ");
   
   
   
 }
 void loop() 
 {
-  Serial.print("Gia tri cam bien:");
-  if (digitalRead(sensor) == 0)
-  {
-    digitalWrite(GREEN_LED, HIGH); 
-    delay(3000);
-  }
-  else{
-    digitalWrite(GREEN_LED, LOW);
-  }
-  // Look for new cards
-  if ( ! mfrc522.PICC_IsNewCardPresent()) 
-  {
-    return;
-  }
-  // Select one of the cards
-  if ( ! mfrc522.PICC_ReadCardSerial()) 
-  {
-    return;
-  }
-  //Show UID on serial monitor
-  Serial.print("UID tag :");
-  String content= "";
-  byte letter;
-  for (byte i = 0; i < mfrc522.uid.size; i++) 
-  {
-     Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
-     Serial.print(mfrc522.uid.uidByte[i], HEX);
-     content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
-     content.concat(String(mfrc522.uid.uidByte[i], HEX));
-  }
-  Serial.println();
-  Serial.print("Message : ");
-  content.toUpperCase();
-  if (content.substring(1) == "3C 87 F6 22")
-  {
-    lcd.clear();
-    lcd.setCursor(1,0);
-    lcd.print("  Open door ");
-    lcd.setCursor(2,1);
-    lcd.print(" cho nguoi vao ");
-    digitalWrite(RED_LED,HIGH);
-      delay(500);
-    Serial.println("Opendoor");
-    Serial.println();
-    digitalWrite(1,1);
-   { 
-      myservo1.write(0);
-      delay(1000);
-      myservo2.write(100);
-      delay(3000);
-      }
-      
-    if(digitalRead(sensor)==0)
-    { 
-      lcd.clear();
-      lcd.setCursor(1,0);
-      lcd.print("  Open door ");
-      lcd.setCursor(2,1);
-      lcd.print(" man go home");
-      Serial.println("man go home");
-      myservo1.write(0);
-      delay(1000);
-      myservo2.write(100);
-      delay(1000);
 
-      }
-   if(digitalRead(sensor)==1)
-      {
-       lcd.clear();
-      lcd.setCursor(1,0);
-      lcd.print("  close door");
-      lcd.setCursor(2,1);
-      lcd.print(" man go out");
-      Serial.println("closedoor");
-      myservo2.write(0);
-      delay(1000);
-      myservo1.write(120);
-      delay(1000);
+  data = Serial.read();
 
-     }
-    }
-else
-  {
-      Serial.println("!Authorized access");
-    Serial.println();
-    digitalWrite(1,0);
-        }
-    if (content.substring(1) == "14 EE FE 2B")
-  {
-        digitalWrite(RED_LED,LOW);
-      delay(500);
-    Serial.println("Authorized access");
-    Serial.println();
-    digitalWrite(1,1);
-  }
-  
- 
-}
-
-// su kien mo cua
-void receiveEvent(int howMany) {
-    String input ="";            //bat tat den khi nhan duoc tin hieu mo cua tu 8266
-    while(0 < Wire.available()){
-    char c = Wire.read(); 
-    input+=c;
-  }
-  String user_name = getValue(input, ',', 0);
-  String param = getValue(input, ',', 1);
-  if(param.equals("open-door")){
-
-      lcd.clear();
-      lcd.setCursor(1,0);
-      lcd.print("  user_name ");
-      lcd.setCursor(2,1);
-      lcd.print(" user_name ");
-      digitalWrite(RED_LED,HIGH);
-      delay(500);
-      Serial.println("user_name");
-      Serial.println();
-      digitalWrite(1,1);
-      myservo1.write(0);
-      delay(1000);
-      myservo2.write(100);
-      delay(3000);
-      }
+  if(data != -1){
+        digitalWrite(RED_LED,HIGH);
+        Serial.println("data from 8266 is:     "+String(data));
+//        myservo1.write(0);
+//        delay(1000);
+//        myservo2.write(100);
+        delay(3000);
        
-}
+  }
   
-String getValue(String data, char separator, int index)
-{
-    int found = 0;
-    int strIndex[] = { 0, -1 };
-    int maxIndex = data.length() - 1;
+  // Look for new cards
+  if ( ! mfrc522.PICC_IsNewCardPresent()) {
+        myservo2.write(0);
+        delay(0);
+        myservo1.write(180);
+        delay(0);
+        
+    return;
+  } 
+  if ( ! mfrc522.PICC_ReadCardSerial()) {
+    
+      return;
+  }
 
-    for (int i = 0; i <= maxIndex && found <= index; i++) {
-        if (data.charAt(i) == separator || i == maxIndex) {
-            found++;
-            strIndex[0] = strIndex[1] + 1;
-            strIndex[1] = (i == maxIndex) ? i+1 : i;
-        }
+  //Show UID on serial monitor
+    Serial.print("UID tag :");
+    String content= "";
+    byte letter;
+    for (byte i = 0; i < mfrc522.uid.size; i++)  {
+      Serial.print(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " ");
+      Serial.print(mfrc522.uid.uidByte[i], HEX);
+      content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
+      content.concat(String(mfrc522.uid.uidByte[i], HEX));
     }
-    return found > index ? data.substring(strIndex[0], strIndex[1]) : "";
-}
+    Serial.println();
+    Serial.print("Message : ");
+    content.toUpperCase();
+    if (content.substring(1) == "3C 87 F6 22") {
+        digitalWrite(RED_LED,HIGH);
+        myservo1.write(0);
+        delay(1000);
+        myservo2.write(100);
+        delay(3000);
+        
+        
+        if(digitalRead(sensor)==0) { 
+          myservo1.write(0);
+          delay(1000);
+          myservo2.write(100);
+          delay(1000);
+        
+       }
+       if(digitalRead(sensor)==1) {
+          myservo2.write(0);
+          delay(1000);
+          myservo1.write(180);
+          delay(1000);
+    
+       }
+       digitalWrite(RED_LED,LOW);
+    } else{
+        Serial.println("!Authorized access");
+        Serial.println();
+        digitalWrite(1,0);
+       
+     }
 
-// function that executes whenever data is requested from master
-void requestEvent() {
-  Wire.print("hello from uno3");
- } 
+  }
