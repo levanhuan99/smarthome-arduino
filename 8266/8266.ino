@@ -15,7 +15,7 @@ void setup() {
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
+    delay(500);
     Serial.println("Connecting to WiFi..");
   }
   Serial.println("IP Address: ");
@@ -24,14 +24,17 @@ void setup() {
  Wire.begin(D1, D2); /* join i2c bus with SDA=D1 and SCL=D2 of NodeMCU */
 
   server.on("/hello", HTTP_GET, [](AsyncWebServerRequest *request){
-    
     request->send(200, "text/plain", "OK");
   });
 
     server.on("/light1-on", HTTP_GET, [] (AsyncWebServerRequest *request) {  //api bat den
+        Serial.println("Above for debugging!");
         Wire.beginTransmission(8); /* begin with device address 8 */
+        Serial.println("under for debugging!");
         Wire.write("1-on");  /* sends id cua thiet bi can bat  string */
+        Serial.println("middle for debugging!");
         Wire.endTransmission();    /* stop transmitting */
+        Serial.println("end for debugging!");
         request->send(200, "text/plain", "OK");
 
   });
@@ -40,7 +43,6 @@ void setup() {
         Wire.beginTransmission(8); /* begin with device address 8 */
         Wire.write("1-off");  /* sends id cua thiet bi can bat  string */
         Wire.endTransmission();    /* stop transmitting */
-
         request->send(200, "text/plain", "OK");
 
   });
@@ -106,12 +108,12 @@ void setup() {
         result+= c;
        
       } 
-      Wire.requestFrom(9, 50); /* request & read data of size 50 from slave */
-      while(Wire.available()){
-        char c1 = Wire.read();
-        result+= c1;
-       
-      } 
+//      Wire.requestFrom(9, 50); /* request & read data of size 50 from slave */
+//      while(Wire.available()){
+//        char c1 = Wire.read();
+//        result+= c1;
+//       
+//      } 
      Serial.print(String(result));
      request->send(200, "text/plain", result);
 
@@ -122,10 +124,11 @@ void setup() {
         Wire.beginTransmission(9); /* begin with device address 9 */
         Wire.write("fan-4-on");  /* sends id cua thiet bi can bat  string */
         Wire.endTransmission();    /* stop transmitting */
+        //request->addHeader("Access-Control-Allow-Origin", "*");
         request->send(200, "text/plain", "OK");
 
   });
-
+  DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
   server.begin();
   GetExternalIP();
 }

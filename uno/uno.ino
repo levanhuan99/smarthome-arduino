@@ -8,6 +8,7 @@ const int ledPin = 13;
 byte LED_state = LOW;       
 byte lastButtonState = LOW;
 
+
 //den va nut bam 2
 const int buttonPin2 = 10;
 const int ledPin2 = 11;
@@ -50,7 +51,7 @@ String temp = "";
 String hum = "";
 
 void setup() {
-   Serial.print("hello");
+   Serial.print("dmmmmmmm");
   
   //lcd va cam bien dht
   lcd.init();  
@@ -82,7 +83,7 @@ void loop() {
     if (buttonState != lastButtonState) { //nut bam bat tat den
       lastButtonState = buttonState;
       if (buttonState == LOW) {
-        LED_state = (LED_state == HIGH) ? LOW: HIGH;  //toán tử so sánh
+        LED_state = (LED_state == HIGH) ? LOW: HIGH;  
         digitalWrite(ledPin, LED_state);
       }
     }
@@ -93,7 +94,7 @@ void loop() {
     if (buttonState2 != lastButtonState2) { //nut bam bat tat den
       lastButtonState2 = buttonState2;
       if (buttonState2 == LOW) {
-        LED_state2 = (LED_state2 == HIGH) ? LOW: HIGH;  //toán tử so sánh
+        LED_state2 = (LED_state2 == HIGH) ? LOW: HIGH; 
         digitalWrite(ledPin2, LED_state2);
       }
     }
@@ -103,7 +104,7 @@ void loop() {
     if (buttonState3 != lastButtonState3) { //nut bam bat tat den
       lastButtonState3 = buttonState3;
       if (buttonState3 == LOW) {
-        LED_state3 = (LED_state3 == HIGH) ? LOW: HIGH;  //toán tử so sánh
+        LED_state3 = (LED_state3 == HIGH) ? LOW: HIGH; 
         digitalWrite(ledPin3, LED_state3);
       }
     }
@@ -142,6 +143,7 @@ void loop() {
 
 // function that executes whenever data is received from master to change led status
 void receiveEvent(int howMany) {
+   Serial.println("start!");
   String status ="";            //bat tat den khi nhan duoc tin hieu tu 8266
   while(0 < Wire.available()){
     char c = Wire.read(); 
@@ -149,23 +151,31 @@ void receiveEvent(int howMany) {
   }
   Serial.println("param from 8266: "+status);
   if(status.equals("1-on")){
+      LED_state = HIGH;
       digitalWrite(ledPin, HIGH);
   }else if(status.equals("1-off")){
+      LED_state = LOW;
      digitalWrite(ledPin, LOW);
   } 
   else if(status.equals("2-on")){
+      LED_state2 = HIGH;
      digitalWrite(ledPin2, HIGH);
   }else if(status.equals("2-off")){
+      LED_state2 = LOW;
      digitalWrite(ledPin2, LOW);
   } 
   else if(status.equals("3-on")){
+      LED_state3 = HIGH;
      digitalWrite(ledPin3, HIGH);
   }else if(status.equals("3-off")){
+    LED_state3 = LOW;
      digitalWrite(ledPin3, LOW);
   } 
   else if(status.equals("4-on")){
+     LED_state4 = HIGH;
      digitalWrite(ledPin4, HIGH);
   }else if(status.equals("4-off")){
+    LED_state4 = LOW;
      digitalWrite(ledPin4, LOW);
      
   } 

@@ -12,11 +12,19 @@ int fan4 = 2;
 
 //
 int relay1 = 7;
+
+
+const int buzzer = 8;
+const int smokeA0 = 22;
+int sensorThres = 400;
+
 void setup()
 {
   Wire.begin(9);                /* join i2c bus with address 9 */
   Wire.onReceive(receiveEvent); /* register receive event */
   Wire.onRequest(requestEvent); /* register request event */
+  pinMode(buzzer, OUTPUT);
+  pinMode(smokeA0, INPUT);
   
   Serial.begin(9600);
   pinMode(led1,OUTPUT);
@@ -147,7 +155,20 @@ void setup()
   )
    {
     digitalWrite(relay1,LOW);
-    }
+   }
+
+  int analogSensor = analogRead(smokeA0);
+  Serial.print("Pin A0: ");
+  Serial.println(analogSensor);
+  // Checks if it has reached the threshold value
+  if (analogSensor > sensorThres)
+  {
+    tone(buzzer, 1000, 200);
+  }
+  else
+  {
+    noTone(buzzer);
+  }
  }
 
  void receiveEvent(int howMany) {

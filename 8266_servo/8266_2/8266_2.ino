@@ -1,9 +1,8 @@
 #include <ESP8266WiFi.h>
 #include <ESPAsyncTCP.h>
 #include <ESPAsyncWebServer.h>
-
+#include <Wire.h>                 //Thư viện giao tiếp I2C
 #include <Servo.h>
-
 // RFID
 #include <SPI.h>
 #include <MFRC522.h>
@@ -14,7 +13,6 @@ const int SS_PIN = 15;         // Configurable, see typical pin layout above
 const int sensor = 9;
 
 MFRC522 mfrc522(SS_PIN, RST_PIN);  // Create MFRC522 instance
-
 
 const char* ssid = "TP-Link"; //Write your SSID
 const char* password = "34219317";   //Write your password
@@ -28,11 +26,14 @@ Servo servoCua;
 AsyncWebServer server(80);
 int angle ;
 
+const int D1 = 5;
+const int D2 = 4;
 
-//const char* PARAM_MESSAGE = "current_user_name";
+const char* PARAM_MESSAGE = "current_user_name";
 
 void setup() {
- Serial.begin(115200); /* begin serial for debug */
+      
+  Serial.begin(9600); /* begin serial for debug */
   // Connect to Wi-Fi
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
@@ -41,7 +42,7 @@ void setup() {
   }
   Serial.println("IP Address: ");
   Serial.println(WiFi.localIP());
-
+  Wire.begin(D1,D2);   
  servoCua.attach(servoPinCua);
  pinMode(sensor,INPUT);
   
@@ -51,9 +52,8 @@ void setup() {
   mfrc522.PCD_DumpVersionToSerial();  // Show details of PCD - MFRC522 Card Reader details
   Serial.println(F("Scan PICC to see UID, SAK, type, and data blocks..."));
 
-
+ Wire.begin(D1, D2); /* join i2c bus with SDA=D1 and SCL=D2 of NodeMCU */
  
-
   server.on("/hello", HTTP_GET, [](AsyncWebServerRequest *request){
     
     request->send(200, "text/plain", "OK");
@@ -64,22 +64,26 @@ void setup() {
         Serial.println("incoming request!");
         angle=100;
         servoCua.write(angle);
+        String message;
+        if (request->hasParam(PARAM_MESSAGE)) {
+            message = request->getParam(PARAM_MESSAGE)->value();
+        } 
+        Serial.println("user name: "+ message);
         request->send(200, "text/plain", "OK");
-
   });
   server.begin();
   GetExternalIP();
 }
 
 void loop() {
-// Look for new cards
- 
+
+ //kiem tra co the hay khong
   if ( ! mfrc522.PICC_IsNewCardPresent()) {
     servoCua.write(angle);
      return;
   }
  
-  // Select one of the cards
+  //neu the k co ma
   if ( ! mfrc522.PICC_ReadCardSerial()) {
     return;
   }
@@ -105,18 +109,14 @@ void loop() {
         servoCua.write(angle);
         delay(1000);
 
-        
-
       //kiem tra cam bien
       
-       if(digitalRead(sensor)== 0) { //
-        Serial.print("Message : GIU VI TRI");
-        servoCua.write(angle);
-
-        
-       }
+       if(digitalRead(sensor)== 0) { // TH sensor = 0 la truong hop co nguoi
+          Serial.print("Message : GIU VI TRI");
+          servoCua.write(angle);
+       } 
      
-       if(digitalRead(sensor)== 1) { // 
+       if(digitalRead(sensor)== 1) { // TH sensor = 1 la khong co nguoi
           Serial.print("Message :  TRO VE VI TRI BAN DAU");
           delay(1000);
           angle = 0;
