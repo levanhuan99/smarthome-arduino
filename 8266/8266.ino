@@ -108,26 +108,118 @@ void setup() {
         result+= c;
        
       } 
-//      Wire.requestFrom(9, 50); /* request & read data of size 50 from slave */
-//      while(Wire.available()){
-//        char c1 = Wire.read();
-//        result+= c1;
-//       
-//      } 
+      Wire.requestFrom(9, 50); /* request & read data of size 50 from slave */
+      while(Wire.available()){
+        char c1 = Wire.read();
+        result+= c1;
+       
+      } 
      Serial.print(String(result));
      request->send(200, "text/plain", result);
 
   });
-  
 
-  server.on("/fan-4-on", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+//dieu khien quat
+  server.on("/fan-1-on", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+        Serial.print("1");
         Wire.beginTransmission(9); /* begin with device address 9 */
-        Wire.write("fan-4-on");  /* sends id cua thiet bi can bat  string */
+         Serial.print("2");
+        Wire.write("fan-1-on");  /* sends id cua thiet bi can bat  string */
+         Serial.print("3");
         Wire.endTransmission();    /* stop transmitting */
+         Serial.print("4");
         //request->addHeader("Access-Control-Allow-Origin", "*");
         request->send(200, "text/plain", "OK");
 
   });
+    server.on("/fan-1-off", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+        Serial.print("1");
+        Wire.beginTransmission(9); /* begin with device address 9 */
+         Serial.print("2");
+        Wire.write("fan-1-off");  /* sends id cua thiet bi can bat  string */
+         Serial.print("3");
+        Wire.endTransmission();    /* stop transmitting */
+         Serial.print("4");
+        //request->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(200, "text/plain", "OK");
+
+  });
+    server.on("/fan-2-on", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+        Serial.print("1");
+        Wire.beginTransmission(9); /* begin with device address 9 */
+         Serial.print("2");
+        Wire.write("fan-2-on");  /* sends id cua thiet bi can bat  string */
+         Serial.print("3");
+        Wire.endTransmission();    /* stop transmitting */
+         Serial.print("4");
+        //request->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(200, "text/plain", "OK");
+
+  });
+  
+  server.on("/fan-2-off", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+        Serial.print("1");
+        Wire.beginTransmission(9); /* begin with device address 9 */
+         Serial.print("2");
+        Wire.write("fan-2-off");  /* sends id cua thiet bi can bat  string */
+         Serial.print("3");
+        Wire.endTransmission();    /* stop transmitting */
+         Serial.print("4");
+        //request->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(200, "text/plain", "OK");
+
+  });
+  server.on("/fan-3-on", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+        Serial.print("1");
+        Wire.beginTransmission(9); /* begin with device address 9 */
+         Serial.print("2");
+        Wire.write("fan-3-on");  /* sends id cua thiet bi can bat  string */
+         Serial.print("3");
+        Wire.endTransmission();    /* stop transmitting */
+         Serial.print("4");
+        //request->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(200, "text/plain", "OK");
+
+  });
+    server.on("/fan-3-off", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+        Serial.print("1");
+        Wire.beginTransmission(9); /* begin with device address 9 */
+         Serial.print("2");
+        Wire.write("fan-3-off");  /* sends id cua thiet bi can bat  string */
+         Serial.print("3");
+        Wire.endTransmission();    /* stop transmitting */
+         Serial.print("4");
+        //request->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(200, "text/plain", "OK");
+
+  });
+    server.on("/fan-4-on", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+        Serial.print("1");
+        Wire.beginTransmission(9); /* begin with device address 9 */
+         Serial.print("2");
+        Wire.write("fan-4-on");  /* sends id cua thiet bi can bat  string */
+         Serial.print("3");
+        Wire.endTransmission();    /* stop transmitting */
+         Serial.print("4");
+        //request->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(200, "text/plain", "OK");
+
+  });
+  
+  server.on("/fan-4-off", HTTP_GET, [] (AsyncWebServerRequest *request) { //api tat den 
+        Serial.print("1");
+        Wire.beginTransmission(9); /* begin with device address 9 */
+         Serial.print("2");
+        Wire.write("fan-4-off");  /* sends id cua thiet bi can bat  string */
+         Serial.print("3");
+        Wire.endTransmission();    /* stop transmitting */
+         Serial.print("4");
+        //request->addHeader("Access-Control-Allow-Origin", "*");
+        request->send(200, "text/plain", "OK");
+
+  });
+
+  
   DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
   server.begin();
   GetExternalIP();

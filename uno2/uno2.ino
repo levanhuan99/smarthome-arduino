@@ -1,193 +1,237 @@
 #include <Wire.h>
 
-int led1 = 11;
-int led2 = 10;
-int led3 = 9;
-int led4 = 8;
-
 int fan1 = 5;
 int fan2 = 4;
 int fan3 = 3;
 int fan4 = 2;
+byte lastButtonState1 = LOW;
+byte lastButtonState2 = LOW;
+byte lastButtonState3 = LOW;
+byte lastButtonState4 = LOW;
 
-//
+//bong den 220v
 int relay1 = 7;
 
-
-const int buzzer = 8;
-const int smokeA0 = 22;
+//cam bien khi gas
+int buzzer = 10;
+int smokeA0 = A3;
+// Your threshold value
 int sensorThres = 400;
+
+//joystick
+int enA = 9;
+int in1 = 11;
+int in2 = 12;
+int speedmotor = 0;
 
 void setup()
 {
   Wire.begin(9);                /* join i2c bus with address 9 */
   Wire.onReceive(receiveEvent); /* register receive event */
   Wire.onRequest(requestEvent); /* register request event */
+  
+  Serial.begin(9600);
   pinMode(buzzer, OUTPUT);
   pinMode(smokeA0, INPUT);
   
-  Serial.begin(9600);
-  pinMode(led1,OUTPUT);
-  pinMode(led2,OUTPUT);
-  pinMode(led3,OUTPUT);
-  pinMode(led4,OUTPUT);
-
   pinMode(fan1,OUTPUT);
   pinMode(fan2,OUTPUT);
   pinMode(fan3,OUTPUT);
   pinMode(fan4,OUTPUT);
-  pinMode(relay1,OUTPUT); 
-  }
-  String voice;
+  pinMode(relay1,OUTPUT);
+
+  pinMode(enA, OUTPUT);
+  pinMode(in1, OUTPUT);
+  pinMode(in2, OUTPUT);
+  
+}
+  
+ String voice;
+  
  void loop()
  {
-  if (Serial.available()>0)
-  {
+    controlJoyStick();
+  if (Serial.available()>0){
     voice="";
-    delay(2);
+    delay(100);
     
     voice=Serial.readString();
-    delay(2);
+    delay(100);
     Serial.print(voice+'\n');
-    }
-  
-  if(voice.equals("bật đèn 1"))
-  {
-    digitalWrite(led1,HIGH);
-    }
-  if(voice.equals("tắt đèn 1"))
-   {
-    digitalWrite(led1,LOW);
-    }
-
-  if(voice.equals("bật đèn 2"))
-  {
-    digitalWrite(led2,HIGH);
-    }
-  if(voice.equals("tắt đèn 2"))
-   {
-    digitalWrite(led2,LOW);
-    }
-
-  if(voice.equals("bật đèn 3"))
-  {
-    digitalWrite(led3,HIGH);
-    }
-  if(voice.equals("tắt đèn 3"))
-   {
-    digitalWrite(led3,LOW);
-    }
-
-  if(voice.equals("bật đèn 4"))
-  {
-    digitalWrite(led4,HIGH);
-    }
-  if(voice.equals("tắt đèn 4"))
-   {
-    digitalWrite(led4,LOW);
-    }
-    
-   if(voice.equals("bật quạt 1"))
-  {
+  }
+  if(voice.equals("bật quạt 1")){
+    passValueToSingleDeviceStatus(lastButtonState1,HIGH);
     digitalWrite(fan1,HIGH);
-    }
-  if(voice.equals("tắt quạt 1"))
-   {
+  }
+  if(voice.equals("tắt quạt 1")){
+    passValueToSingleDeviceStatus(lastButtonState1,LOW);
     digitalWrite(fan1,LOW);
-    }
+  }
 
-  if(voice.equals("bật quạt 2"))
-  {
+  if(voice.equals("bật quạt 2")){
+    passValueToSingleDeviceStatus(lastButtonState2,HIGH);
     digitalWrite(fan2,HIGH);
-    }
-  if(voice.equals("tắt quạt 2"))
-   {
+  }
+  if(voice.equals("tắt quạt 2")){
+    passValueToSingleDeviceStatus(lastButtonState2,LOW);
     digitalWrite(fan2,LOW);
-    }
+  }
 
-  if(voice.equals("bật quạt 3"))
-  {
+  if(voice.equals("bật quạt 3")){
+    passValueToSingleDeviceStatus(lastButtonState3,HIGH);
     digitalWrite(fan3,HIGH);
     }
-  if(voice.equals("tắt quạt 3"))
-   {
+  if(voice.equals("tắt quạt 3")){
+    passValueToSingleDeviceStatus(lastButtonState3,LOW);
     digitalWrite(fan3,LOW);
-    }
+  }
 
-  if(voice.equals("bật quạt 4"))
-  {
+  if(voice.equals("bật quạt 4")){
+    passValueToSingleDeviceStatus(lastButtonState4,HIGH);
     digitalWrite(fan4,HIGH);
-    }
-  if(voice.equals("tắt quạt 4"))
-   {
+  }
+  if(voice.equals("tắt quạt 4")){
+    passValueToSingleDeviceStatus(lastButtonState4,LOW);
     digitalWrite(fan4,LOW);
-    }
+  }
 
 
    if(voice.equals("tắt hết")){
+    passValueToAllFanStatus(LOW);
     digitalWrite(fan4,LOW);
     digitalWrite(fan3,LOW);
     digitalWrite(fan2,LOW);
     digitalWrite(fan1,LOW);
-
-    digitalWrite(led1,LOW);
-    digitalWrite(led2,LOW);
-    digitalWrite(led3,LOW);
-    digitalWrite(led4,LOW);
+    digitalWrite(relay1,LOW);
    }
    if(voice.equals("bật hết")){
+    passValueToAllFanStatus(HIGH);
     digitalWrite(fan4,HIGH);
     digitalWrite(fan3,HIGH);
     digitalWrite(fan2,HIGH);
     digitalWrite(fan1,HIGH);
-
-    digitalWrite(led1,HIGH);
-    digitalWrite(led2,HIGH);
-    digitalWrite(led3,HIGH);
-    digitalWrite(led4,HIGH);
+    digitalWrite(relay1,HIGH);
    }
    
-  if(voice.equals("bật đèn"))
-  {
+  if(voice.equals("bật đèn")){
     digitalWrite(relay1,HIGH);
     }
-  if(voice.equals("Tắt đèn") || voice.equals("tắt đèn") || voice.equals("Tắt Đèn")
-  )
-   {
+  if(voice.equals("Tắt đèn") || voice.equals("tắt đèn") || voice.equals("Tắt Đèn")){
     digitalWrite(relay1,LOW);
-   }
+  }
 
+// kiem tra cam bien khi gas va thong bao coi
+  checkGasSensorAndShowBuzzer();
+
+  
+ }
+void controlJoyStick(){
+        int xAxis = analogRead(A0);
+      int yAxis = analogRead(A1);
+
+      //y-Axis
+      if(yAxis <470){
+        digitalWrite(in1,HIGH);
+        digitalWrite(in2,LOW);
+        speedmotor = map(yAxis, 470, 0, 0, 225);
+      }
+      else if(yAxis > 550){
+        digitalWrite(in1,LOW);
+        digitalWrite(in2,HIGH);
+        speedmotor = map(yAxis, 550, 1023, 0, 225);
+      }
+      //
+      else{
+        speedmotor = 0;
+      }
+
+      
+      //X-Axis
+      if(xAxis < 470){
+        int xMapped = map(xAxis, 470, 0, 0, 100);
+        speedmotor = speedmotor - xMapped;
+        if(speedmotor < 0){
+          speedmotor = 0;
+        }
+      }
+
+       if(xAxis > 550){
+        int xMapped = map(xAxis, 550, 1023, 0, 100);
+        speedmotor = speedmotor + xMapped;
+        if(speedmotor > 255){
+          speedmotor = 255;
+        }
+      }
+      if(speedmotor < 70){
+        speedmotor = 0;
+      }
+      analogWrite(enA, speedmotor);
+}
+void checkGasSensorAndShowBuzzer(){
   int analogSensor = analogRead(smokeA0);
-  Serial.print("Pin A0: ");
   Serial.println(analogSensor);
   // Checks if it has reached the threshold value
-  if (analogSensor > sensorThres)
-  {
+  if (analogSensor > sensorThres){
+    
     tone(buzzer, 1000, 200);
+    delay(2000);
   }
-  else
-  {
-    noTone(buzzer);
+  else  {
+     noTone(buzzer);
   }
- }
 
- void receiveEvent(int howMany) {
+}
+
+void passValueToAllFanStatus(byte status){
+   lastButtonState1 = status;
+   lastButtonState2 = status;
+   lastButtonState3 = status;
+   lastButtonState4 = status;
+}
+void passValueToSingleDeviceStatus(byte device, byte status){
+  device  = status;
+}
+
+void receiveEvent(int howMany) {
     String status ="";            //bat tat den khi nhan duoc tin hieu tu 8266
   while(0 < Wire.available()){
     char c = Wire.read(); 
     status+=c;
   }
-  
+  if(status.equals("fan-1-on")){
+    passValueToSingleDeviceStatus(lastButtonState1,HIGH);
+    digitalWrite(fan1, HIGH);
+  }else if(status.equals("fan-1-off")){
+    passValueToSingleDeviceStatus(lastButtonState1,LOW);
+    digitalWrite(fan1, LOW);
+  } 
+  if(status.equals("fan-2-on")){
+    passValueToSingleDeviceStatus(lastButtonState2,HIGH);
+    digitalWrite(fan2, HIGH);
+  }else if(status.equals("fan-2-off")){
+    passValueToSingleDeviceStatus(lastButtonState2,LOW);
+    digitalWrite(fan2, LOW);
+  } 
+  if(status.equals("fan-3-on")){
+    passValueToSingleDeviceStatus(lastButtonState3,HIGH);
+    digitalWrite(fan3, HIGH);
+  }else if(status.equals("fan-3-off")){
+    passValueToSingleDeviceStatus(lastButtonState3,LOW);
+    digitalWrite(fan3, LOW);
+  } 
   if(status.equals("fan-4-on")){
-      digitalWrite(fan4, HIGH);
+    passValueToSingleDeviceStatus(lastButtonState4,HIGH);
+    digitalWrite(fan4, HIGH);
   }else if(status.equals("fan-4-off")){
-     digitalWrite(fan4, LOW);
+    passValueToSingleDeviceStatus(lastButtonState4,LOW);
+    digitalWrite(fan4, LOW);
   } 
   
- }
+}
 
 // function that executes whenever data is requested from master
 void requestEvent() {
-  Wire.print("hello from uno2");
+  //Wire.print(String(temp)+","+String(hum) +","+LED_state+","+LED_state2+","+LED_state3+","+LED_state4);
 
-} 
+
+}
