@@ -128,7 +128,6 @@ void setup() {
          Serial.print("3");
         Wire.endTransmission();    /* stop transmitting */
          Serial.print("4");
-        //request->addHeader("Access-Control-Allow-Origin", "*");
         request->send(200, "text/plain", "OK");
 
   });
@@ -140,7 +139,6 @@ void setup() {
          Serial.print("3");
         Wire.endTransmission();    /* stop transmitting */
          Serial.print("4");
-        //request->addHeader("Access-Control-Allow-Origin", "*");
         request->send(200, "text/plain", "OK");
 
   });
@@ -152,7 +150,6 @@ void setup() {
          Serial.print("3");
         Wire.endTransmission();    /* stop transmitting */
          Serial.print("4");
-        //request->addHeader("Access-Control-Allow-Origin", "*");
         request->send(200, "text/plain", "OK");
 
   });
@@ -165,7 +162,6 @@ void setup() {
          Serial.print("3");
         Wire.endTransmission();    /* stop transmitting */
          Serial.print("4");
-        //request->addHeader("Access-Control-Allow-Origin", "*");
         request->send(200, "text/plain", "OK");
 
   });
@@ -177,7 +173,6 @@ void setup() {
          Serial.print("3");
         Wire.endTransmission();    /* stop transmitting */
          Serial.print("4");
-        //request->addHeader("Access-Control-Allow-Origin", "*");
         request->send(200, "text/plain", "OK");
 
   });
@@ -189,7 +184,6 @@ void setup() {
          Serial.print("3");
         Wire.endTransmission();    /* stop transmitting */
          Serial.print("4");
-        //request->addHeader("Access-Control-Allow-Origin", "*");
         request->send(200, "text/plain", "OK");
 
   });
@@ -201,7 +195,6 @@ void setup() {
          Serial.print("3");
         Wire.endTransmission();    /* stop transmitting */
          Serial.print("4");
-        //request->addHeader("Access-Control-Allow-Origin", "*");
         request->send(200, "text/plain", "OK");
 
   });
@@ -214,7 +207,6 @@ void setup() {
          Serial.print("3");
         Wire.endTransmission();    /* stop transmitting */
          Serial.print("4");
-        //request->addHeader("Access-Control-Allow-Origin", "*");
         request->send(200, "text/plain", "OK");
 
   });
