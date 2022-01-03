@@ -59,44 +59,44 @@ void setup()
     delay(100);
     Serial.print(voice+'\n');
   }
-  if(voice.equals("bật quạt 1")){
+  if(voice.equals("bật quạt phòng khách") || ( voice.indexOf("bật") >0 && voice.indexOf("khách") >0) ){
     passValueToSingleDeviceStatus(lastButtonState1,HIGH);
     digitalWrite(fan1,HIGH);
   }
-  if(voice.equals("tắt quạt 1")){
+  if(voice.equals("tắt quạt phòng khách") || ( voice.indexOf("bật") >0 && voice.indexOf("khách") >0)){
     passValueToSingleDeviceStatus(lastButtonState1,LOW);
     digitalWrite(fan1,LOW);
   }
 
-  if(voice.equals("bật quạt 2")){
+  if(voice.equals("bật quạt phòng ngủ 1") || voice.equals("bật quạt phòng ngủ một") || ( voice.indexOf("bật") >0 && voice.indexOf("1") >0)){
     passValueToSingleDeviceStatus(lastButtonState2,HIGH);
     digitalWrite(fan2,HIGH);
   }
-  if(voice.equals("tắt quạt 2")){
+  if(voice.equals("tắt quạt phòng ngủ 1") || voice.equals("tắt quạt phòng ngủ một") || ( voice.indexOf("tắt") >0 && voice.indexOf("1") >0) ){
     passValueToSingleDeviceStatus(lastButtonState2,LOW);
     digitalWrite(fan2,LOW);
   }
 
-  if(voice.equals("bật quạt 3")){
+  if(voice.equals("bật quạt phòng ngủ 2") || voice.equals("bật quạt phòng ngủ hai") || ( voice.indexOf("bật") >0 && voice.indexOf("2") >0)){
     passValueToSingleDeviceStatus(lastButtonState3,HIGH);
     digitalWrite(fan3,HIGH);
     }
-  if(voice.equals("tắt quạt 3")){
+  if(voice.equals("tắt quạt phòng ngủ 2") || voice.equals("tắt quạt phòng ngủ hai")  || ( voice.indexOf("tắt") >0 && voice.indexOf("2") >0)){
     passValueToSingleDeviceStatus(lastButtonState3,LOW);
     digitalWrite(fan3,LOW);
   }
 
-  if(voice.equals("bật quạt 4")){
+  if(voice.equals("bật quạt phòng bếp") || ( voice.indexOf("bật") >0 && voice.indexOf("bếp") >0)){
     passValueToSingleDeviceStatus(lastButtonState4,HIGH);
     digitalWrite(fan4,HIGH);
   }
-  if(voice.equals("tắt quạt 4")){
+  if(voice.equals("tắt quạt phòng bếp") || ( voice.indexOf("tắt") >0 && voice.indexOf("bếp") >0)){
     passValueToSingleDeviceStatus(lastButtonState4,LOW);
     digitalWrite(fan4,LOW);
   }
 
 
-   if(voice.equals("tắt hết")){
+   if(voice.equals("tắt hết quạt")){
     passValueToAllFanStatus(LOW);
     digitalWrite(fan4,LOW);
     digitalWrite(fan3,LOW);
@@ -104,7 +104,7 @@ void setup()
     digitalWrite(fan1,LOW);
     digitalWrite(relay1,LOW);
    }
-   if(voice.equals("bật hết")){
+   if(voice.equals("bật hết quạt")){
     passValueToAllFanStatus(HIGH);
     digitalWrite(fan4,HIGH);
     digitalWrite(fan3,HIGH);
@@ -126,7 +126,7 @@ void setup()
   
  }
 void controlJoyStick(){
-        int xAxis = analogRead(A0);
+      int xAxis = analogRead(A0);
       int yAxis = analogRead(A1);
 
       //y-Axis
@@ -169,7 +169,7 @@ void controlJoyStick(){
 }
 void checkGasSensorAndShowBuzzer(){
   int analogSensor = analogRead(smokeA0);
-  Serial.println(analogSensor);
+//  Serial.println(analogSensor);
   // Checks if it has reached the threshold value
   if (analogSensor > sensorThres){
     
@@ -231,7 +231,7 @@ void receiveEvent(int howMany) {
 
 // function that executes whenever data is requested from master
 void requestEvent() {
-  //Wire.print(String(temp)+","+String(hum) +","+LED_state+","+LED_state2+","+LED_state3+","+LED_state4);
-
+  Wire.print(String(",")+lastButtonState1+","+lastButtonState2+","+lastButtonState3+","+lastButtonState4);
+//  Wire.print(lastButtonState1+","+lastButtonState2+","+lastButtonState3+","+lastButtonState4);
 
 }
