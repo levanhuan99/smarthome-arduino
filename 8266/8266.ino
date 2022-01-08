@@ -101,14 +101,14 @@ void setup() {
 
   //lay nhiet do, do am/tran thai den
      server.on("/get-all-status", HTTP_GET, [] (AsyncWebServerRequest *request) { 
-      Wire.requestFrom(8, 50); /* request & read data of size 50 from slave */
+      Wire.requestFrom(8, 19); /* request & read data of size 50 from slave */
       String result = "";
       while(Wire.available()){
         char c = Wire.read();
         result+= c;
        
       } 
-      Wire.requestFrom(9, 50); /* request & read data of size 50 from slave */
+      Wire.requestFrom(9, 8); /* request & read data of size 50 from slave */
       while(Wire.available()){
         char c1 = Wire.read();
         result+= c1;

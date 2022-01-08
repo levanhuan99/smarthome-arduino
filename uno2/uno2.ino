@@ -63,7 +63,7 @@ void setup()
     passValueToSingleDeviceStatus(lastButtonState1,HIGH);
     digitalWrite(fan1,HIGH);
   }
-  if(voice.equals("tắt quạt phòng khách") || ( voice.indexOf("bật") >0 && voice.indexOf("khách") >0)){
+  if(voice.equals("tắt quạt phòng khách") || ( voice.indexOf("bật") >0 && voice.indexOf("khách") >0) ){
     passValueToSingleDeviceStatus(lastButtonState1,LOW);
     digitalWrite(fan1,LOW);
   }
@@ -232,6 +232,4 @@ void receiveEvent(int howMany) {
 // function that executes whenever data is requested from master
 void requestEvent() {
   Wire.print(String(",")+lastButtonState1+","+lastButtonState2+","+lastButtonState3+","+lastButtonState4);
-//  Wire.print(lastButtonState1+","+lastButtonState2+","+lastButtonState3+","+lastButtonState4);
-
 }
